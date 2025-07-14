@@ -23,9 +23,6 @@ properties (e.g. mat.E or mat.YS).
 - `NamedMaterial`
 
 Define a custom material with the `Material` class and assign properties to it.
-Refer to the naming conventions to for consistency. It basically is just a
-container for key-value data accessible as properties on the object.
-
 Or, import a standard library material - some are included in the package so
 far:
 
@@ -65,10 +62,9 @@ far:
 60200
 ```
 
-
 ### Shapes
 
-Classes to define and retrive steructural shapes and obtain derived properties.
+Classes to define and retrieve structural shapes and obtain derived properties.
 
 Structural shapes as defined in the AISC Shapes Database:
 - `W`
