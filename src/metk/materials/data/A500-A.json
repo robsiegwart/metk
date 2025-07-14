@@ -1,0 +1,21 @@
+{
+  "name": "A500 Grade A",
+  "standard": "ASTM A500",
+  "composition": {
+    "carbon": 0.0026,
+    "manganese": 1.35,
+    "phosphorous": 0.00035,
+    "sulfur": 0.00035,
+    "copper": 0.002
+  },
+  "properties": {
+    "density": 0.282,
+    "YS_min": 39000,
+    "UTS_min": 45000,
+    "modulus of elasticity": 29e6,
+    "elongation": 0.25
+  },
+  "meta": {
+    "unit system": "USCS"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "4140 (annealed)",
+  "properties": {
+    "density": 0.284,
+    "YS_min": 60000,
+    "UTS_min": 95000,
+    "modulus of elasticity": 29e6
+  },
+  "meta": {
+    "source": "matweb.com",
+    "temperature": "room",
+    "unit system": "USCS"
+  }
+}

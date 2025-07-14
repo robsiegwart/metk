@@ -1,0 +1,26 @@
+{
+  "name": "Grade 5",
+  "standard": "SAE J429",
+  "composition": {},
+  "properties": {
+    "0.25-1": {
+      "proof load": 85000,
+      "YS_min": 92000,
+      "UTS_min": 120000,
+      "elongation": 0.14,
+      "reduction_of_area": 0.35,
+      "hardness_HRC": "C25-C34"
+    },
+    "1-1.5": {
+      "proof load": 74000,
+      "YS_min": 81000,
+      "UTS_min": 105000,
+      "elongation": 0.14,
+      "reduction of area": 0.35,
+      "hardness HRC": "C19-C30"
+    }
+  },
+  "meta": {
+    "unit system": "USCS"
+  }
+}

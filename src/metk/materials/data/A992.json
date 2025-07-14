@@ -1,0 +1,17 @@
+{
+    "name": "A992",
+    "standard": "ASTM A992",
+    "composition": { },
+    "properties": {
+        "density": 0.284,
+        "YS_min": 50000,
+        "UTS_min": 65000,
+        "modulus of elasticity": 29e6,
+        "elongation": 0.18
+    },
+    "meta": {
+        "source:": "wikipedia.com",
+        "temperature": "room",
+        "unit system": "USCS"
+    }
+}

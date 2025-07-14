@@ -1,0 +1,24 @@
+{
+    "name": "A572 Grade 60",
+    "standard": "ASTM A572",
+    "composition": {
+         "carbon": 0.0026,
+         "iron": 0.98,
+         "manganese": 1.35,
+         "phosphorous": 0.0004,
+         "silicon": 0.004,
+         "sulfur": 0.005
+    },
+    "properties": {
+        "density": 0.282,
+        "YS_min": 60200,
+        "UTS_min": 75400,
+        "modulus of elasticity": 29e6,
+        "elongation": 0.16
+    },
+    "meta": {
+        "source:": "matweb.com",
+        "temperature": "room",
+        "unit system": "USCS"
+    }
+}

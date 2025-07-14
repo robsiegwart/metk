@@ -1,0 +1,13 @@
+[project]
+name = "metk"
+version = "0.1.0"
+description = "Utilties for mechanical engineering machine design calculations"
+authors = [{ name = "Rob Siegwart", email = "rob@robsiegwart.com" }]
+dependencies = [
+    "numpy",
+    "pandas",
+    "tabulate"
+]
+
+[project.optional-dependencies]
+dev = ["pytest"]

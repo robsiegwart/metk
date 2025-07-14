@@ -1,0 +1,26 @@
+{
+    "name": "A36",
+    "standard": "ASTM A36",
+    "composition": {
+         "carbon": 0.0029,
+         "copper": 0.002,
+         "iron": 0.98,
+         "manganese": 1.0,
+         "phosphorous": 0.0004,
+         "silicon": 0.00275,
+         "sulfur": 0.0005
+    },
+    "properties": {
+        "density": 0.284,
+        "YS_min": 36000,
+        "UTS_min": 58000,
+        "UTS_max": 80000,
+        "modulus of elasticity": 29e6,
+        "elongation": 0.2
+    },
+    "meta": {
+        "source": "ASTM A36/A 36M - 05",
+        "temperature": "room",
+        "unit system": "USCS"
+    }
+}
