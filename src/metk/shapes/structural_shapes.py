@@ -3,10 +3,9 @@ Standard structural shape classes.
 '''
 
 import re
-import json
 import os.path
 from numpy import isreal, sqrt
-from pandas import DataFrame, read_pickle
+from pandas import read_pickle
 from metk.shapes.base import BaseShape
 from metk.core import standardized
 
