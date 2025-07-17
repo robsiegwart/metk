@@ -2,7 +2,7 @@
 Weld Shape Classes
 '''
 
-from math import sqrt, isnan
+from math import isnan
 from metk.shapes.base import BaseShape
 
 
@@ -40,6 +40,7 @@ class BaseWeldShape(BaseShape):
         return f'{self.label} weld shape (d={self.d}, b={self.b})'
     
     __str__ = __repr__
+
 
 class LineWeld(BaseWeldShape):
     '''
@@ -106,7 +107,7 @@ class BoxWeld(BaseWeldShape):
         ┏━━━ y ━━━┓ ---/-
         ┃    |    ┃    |
         ┃    o--x ┃    d
-        ┃   ∕     ┃    |
+        ┃   /     ┃    |
         ┗ z ━━━━━━┛ ---/-
         |         |
         /--- b ---/
@@ -165,7 +166,7 @@ class DoubleLineWeld(BaseWeldShape):
         ┃   y   ┃      |
         ┃   |   ┃      |
         ┃   o---x      d
-        ┃  ∕    ┃      |
+        ┃  /    ┃      |
         ┃z      ┃  ____|_
         |-- b --|
             
@@ -212,7 +213,7 @@ class DoubleLineWeld(BaseWeldShape):
     @property
     def cy_high(self):
         return self.d/2
-    
+
 
 SHAPES = { shape.label: shape for shape in [LineWeld, BoxWeld, DoubleLineWeld] }
 

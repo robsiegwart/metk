@@ -17,7 +17,7 @@ class metkObject:
     Base class for various classes in this package.
     
     References attributes ``_properties`` and ``_methods`` which can be
-    overrided on child objects.
+    overridden on child objects.
     '''
     _properties = []
     _methods = []
