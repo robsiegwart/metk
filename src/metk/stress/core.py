@@ -17,7 +17,7 @@ def SRSS(*args):
 
 class StressElement(metkObject):
     """
-    A stress element containing 6 normal stresses and 6 shear stresses.
+    A stress element containing 3 normal stresses and 3 shear stresses.
 
     :param S:   Input stress values, either a 1x6 list/array or a 3x3 array.
     """
