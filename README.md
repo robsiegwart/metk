@@ -201,9 +201,9 @@ English Engineering units):
 
 ### Stress
 
-`StressElement` represents a stress point under arbitrary loading: forces in x,
-y, or z, and moments in x, y, or z. After adding loads, derived stress
-quantities are available, including:
+`StressElement` represents a 3D stress point defined by its stress components:
+normal stresses in x, y, and z; and shear stresses in xy, yz, and xz planes.
+Derived stress quantities are then available:
 
 - principal stresses (normal, shear)
 - equivelent/von Mises stress
