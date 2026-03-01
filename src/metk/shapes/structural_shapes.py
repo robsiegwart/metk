@@ -5,8 +5,8 @@ Standard structural shape classes.
 import re
 import sqlite3
 import os.path
-from numpy import isreal, sqrt
-from pandas import read_sql
+from numpy import sqrt
+from pandas import read_sql, to_numeric
 from metk.shapes.base import BaseShape
 from metk.core import standardized
 
@@ -66,7 +66,7 @@ class StandardShape(BaseShape):
 
         try:
             data = self._db.loc[self.name]
-            self._data = data[data.apply(isreal)]
+            self._data = to_numeric(data, errors="coerce").dropna()
             del self._db
             self._prop_adder = [k for k, v in self._data.items() if v]
 
