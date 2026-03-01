@@ -21,12 +21,16 @@ class BaseMaterial(metkObject):
     
     def __getattr__(self, attr, subdict='properties'):
         '''Get a property -- default to the physical property sub-dict'''
+        
         data_prop = material_prop_aliases.get(standardized(attr), None)
+        """Get the standardized property name from the aliases."""
+
         if data_prop:
             try:
                 return self._data[subdict][data_prop]
+            
             except KeyError:
-                for each in ['composition','meta']:
+                for each in ['composition', 'meta']:
                     try:
                         return self._data[each][attr]
                     except KeyError:

@@ -4,6 +4,7 @@ Basic, custom material classes.
 
 from .base_materials import BaseMaterial, LibraryMaterial
 
+
 class Material(BaseMaterial):
     '''Custom user-defined material
     
@@ -15,14 +16,16 @@ class Material(BaseMaterial):
     '''
     def __init__(self, **kwargs):
         self._data = {}
+        
+        data_dict = {}
         for k,v in kwargs.items():
-            self._data.update({k:v})
+            data_dict.update({k:v})
+        
+        self._data['properties'] = data_dict
+        
         self._prop_adder = list(self._data.keys())
+        self.name = kwargs.get('name', 'User-defined material')
 
-    def __str__(self):
-        name = self.name or 'User-defined material\n'
-        return name + self.properties
-    
 
 class NamedMaterial(LibraryMaterial):
     def __init__(self, name, grade=None):
