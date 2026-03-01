@@ -7,6 +7,7 @@ import random
 from numbers import Number
 from tabulate import tabulate
 from metk.props import *
+from typing import Any, Dict, Tuple
 
 
 UUID_CHOICES = [ letter for letter in string.ascii_letters ] + list(range(0,10))
@@ -14,33 +15,30 @@ UUID_CHOICES = [ letter for letter in string.ascii_letters ] + list(range(0,10))
 
 class metkObject:
     '''
-    Base class for various classes in this package.
+    Base class for the classes in this package.
     
-    References attributes ``_properties`` and ``_methods`` which can be
-    overridden on child objects.
+    Provides standardized interfaces for inspecting properties and methods.
     '''
-    _properties = []
-    _methods = []
+    _properties: Tuple[str, ...] = ()
     
     @property
     def properties(self):
-        '''
-        Return as a string a table of the objects' properties and values if it
-        has one.
-        '''
-        return tabulate(
-            [ [prop, nformat(getattr(self, prop, None))] for prop in self._properties ],
-            tablefmt='grid', numalign='left')
+        '''Return a table of the object's properties and values.'''
+        rows = []
+        for prop in self._properties:
+            v = getattr(self, prop, None)
+            formatted = ', '.join(str(x) for x in v) if isinstance(v, list) else nformat(v)
+            rows.append([prop, formatted])
+        return tabulate(rows, tablefmt='grid', numalign='left')
     
     @property
-    def _prop_dict(self):
+    def prop_dict(self) -> Dict[str, Any]:
+        '''Return a dict of the object's properties and their values.'''
         return { k:getattr(self,k,None) for k in self._properties }
 
-    @property
-    def methods(self):
-        return tabulate(
-            [ [item, getattr(self, item).__doc__] for item in self._methods ],
-            tablefmt='grid', numalign='left')
+    def __repr__(self) -> str:
+        props = ', '.join(f'{k}={v!r}' for k, v in self.prop_dict.items())
+        return f'{type(self).__name__}({props})'
 
 
 def simple_uuid(length=8):
@@ -65,34 +63,33 @@ def prop_lookup(prop):
     return None
 
 
-def nformat(number):
+def nformat(number: int | float | None) -> str:
     '''
-    Return a formatted representation of a number so that is has long decimals
-    removed and commas inserted. ::
+    Return a formatted string representation of a number with adaptive
+    precision and comma separators for large values. ::
 
         3498234.20394   =>  3,498,234
         324.23235       =>  324
         49.494          =>  49.5
         4.494           =>  4.49
         0.549494        =>  0.549
+        0.000300        =>  3.00e-04
+        None            =>  ''
     '''
-    if not isinstance(number, Number):
-        return number
-    if isinstance(number, list):
-        return [ nformat(each) for each in number ]
+    if number is None:
+        return ''
+    
     if number == 0:
-        return 0
-    number = float(number)
+        return '0'
+    
     if abs(number) < 0.001:
-        return '{:.6f}'.format(number)
+        return '{:.2e}'.format(number)
     elif abs(number) < 1:
         return '{:.3f}'.format(number)
     elif abs(number) < 10:
         return '{:.2f}'.format(number)
     elif abs(number) < 100:
         return '{:.1f}'.format(number)
-    elif abs(number) < 1000:
-        return '{:.0f}'.format(number)
     else:
         return '{:,.0f}'.format(number)
 

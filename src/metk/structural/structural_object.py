@@ -321,7 +321,7 @@ class StructuralObject(metkObject):
         
         for obj in [ self.shape, self.loads, self.material ]:
             if obj is not None:
-                for k,v in obj._prop_dict.items():
+                for k,v in obj.prop_dict.items():
                     if k in index:
                         continue
                     index.append(k)
