@@ -65,7 +65,7 @@ class Circle(DoublySymmetricShape):
     
     @property
     def J(self):
-        return pi*self.r**4/4
+        return pi*self.r**4/2
     
     @property
     def c(self):
