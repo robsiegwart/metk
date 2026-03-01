@@ -316,9 +316,9 @@ class StructuralObject(metkObject):
         their values.
         """
         # update equations with values for pretty printing
-        for k, eq in self._equations.items():
+        for eq in self._equations.values():
             eq.evaluate()
-        for k, eq in self._doc_equations.items():
+        for eq in self._doc_equations.values():
             eq.evaluate()
 
     @property
@@ -421,6 +421,6 @@ class StructuralObjectGroup(Collection):
         return len(self.objects)
 
     def __getitem__(self, index):
-        if type(index) != int:
+        if not isinstance(index, int):
             raise TypeError("Access by index only")
         return self.objects[index]
