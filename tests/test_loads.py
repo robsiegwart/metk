@@ -147,21 +147,12 @@ class TestLoadCoordinateTransform:
 
 
 class TestLoadArithmetic:
-    @pytest.mark.xfail(
-        reason='Load.__add__ concatenates self.value + other.value as Python '
-               'lists instead of element-wise addition. self.value should '
-               'return a numpy array or __add__ should use numpy.'
-    )
     def test_add_two_loads(self):
         a = Load(fx=10)
         b = Load(fx=5)
         result = a + b
         assert result.fx == pytest.approx(15)
 
-    @pytest.mark.xfail(
-        reason='Load.__mul__ uses scalar * list which repeats the list instead '
-               'of scaling each component. self.value should return a numpy array.'
-    )
     def test_multiply_load_by_scalar(self):
         load = Load(fx=10, fz=5)
         result = load * 2

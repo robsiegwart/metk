@@ -206,7 +206,7 @@ class Load(metkObject):
     
     @property
     def value(self):
-        return list(self._transformed_value)
+        return self._transformed_value
 
     @property
     def fx(self):
@@ -240,14 +240,14 @@ class Load(metkObject):
     m_z = mz
     
     def __mul__(self, scalar):
-        return Load(scalar*self.value)
-    
+        return Load(*(scalar * self.value))
+
     __rmul__ = __mul__
 
     def __add__(self, other):
         if not isinstance(other, Load):
             raise Exception
-        return Load(self.value + other.value)
+        return Load(*(self.value + other.value))
     
     def __str__(self):
         return '   '.join([ f'{label}={nformat(getattr(self,label))}' for label in self._coords.keys() if getattr(self,label) ])
