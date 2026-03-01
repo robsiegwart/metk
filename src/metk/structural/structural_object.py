@@ -332,7 +332,7 @@ class StructuralObject(metkObject):
     @property
     def results_table(self):
         resdict = self.series.to_dict()
-        formatted = { k:nformat(v) for k,v in resdict.items() }
+        formatted = { k: v if isinstance(v, str) else nformat(v) for k,v in resdict.items() }
         return tabulate(formatted.items())
     
 
