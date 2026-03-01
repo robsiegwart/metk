@@ -1,10 +1,10 @@
-'''
+"""
 Tests for load classes: Factor, Load, Force, Moment, CombinedLoad.
 
 Two tests are marked xfail to document known bugs in Load.__add__ and
 Load.__mul__, which use Python list operators (+, *) on self.value instead
 of element-wise numeric operations.
-'''
+"""
 
 import pytest
 import numpy as np
@@ -14,6 +14,7 @@ from metk.loads import Factor, Load, Force, Moment, CombinedLoad
 # ===========================================================================
 # Factor
 # ===========================================================================
+
 
 class TestFactor:
     def test_value_stored(self):
@@ -25,8 +26,8 @@ class TestFactor:
         assert f.value == 1
 
     def test_name_stored(self):
-        f = Factor(1.5, name='DL')
-        assert f.name == 'DL'
+        f = Factor(1.5, name="DL")
+        assert f.name == "DL"
 
     def test_mul_with_scalar(self):
         f = Factor(2)
@@ -37,18 +38,19 @@ class TestFactor:
         assert 5 * f == 15
 
     def test_repr_with_name(self):
-        f = Factor(1.2, name='LL')
-        assert 'LL' in repr(f)
-        assert '1.2' in repr(f)
+        f = Factor(1.2, name="LL")
+        assert "LL" in repr(f)
+        assert "1.2" in repr(f)
 
     def test_repr_without_name(self):
         f = Factor(2)
-        assert '2' in repr(f)
+        assert "2" in repr(f)
 
 
 # ===========================================================================
 # Load
 # ===========================================================================
+
 
 class TestLoadConstruction:
     def test_fx_kwarg(self):
@@ -78,8 +80,8 @@ class TestLoadConstruction:
 
     def test_default_primary_secondary(self):
         load = Load()
-        assert load.primary == 'x'
-        assert load.secondary == 'y'
+        assert load.primary == "x"
+        assert load.secondary == "y"
 
     def test_force_array(self):
         load = Load(fx=1, fy=2, fz=3)
@@ -91,16 +93,16 @@ class TestLoadConstruction:
 
     def test_invalid_primary_secondary_combo_raises(self):
         with pytest.raises(Exception):
-            Load(primary='x', secondary='x')
+            Load(primary="x", secondary="x")
 
     def test_invalid_axis_label_raises(self):
         with pytest.raises(Exception):
-            Load(primary='a', secondary='b')
+            Load(primary="a", secondary="b")
 
 
 class TestLoadCoordinateTransform:
     def test_identity_returns_raw_values(self):
-        load = Load(fx=10, fy=5, fz=2, primary='x', secondary='y')
+        load = Load(fx=10, fy=5, fz=2, primary="x", secondary="y")
         assert load.fx == 10
         assert load.fy == 5
         assert load.fz == 2
@@ -108,7 +110,7 @@ class TestLoadCoordinateTransform:
     def test_y_primary_x_secondary_remaps_fx_fy(self):
         # local x = global y, local y = global x
         # A global fy=10 appears as fx in the local frame
-        load = Load(fx=0, fy=10, fz=0, primary='y', secondary='x')
+        load = Load(fx=0, fy=10, fz=0, primary="y", secondary="x")
         assert load.fx == pytest.approx(10)
 
     def test_vector_input_identity(self):
@@ -135,7 +137,7 @@ class TestLoadCoordinateTransform:
 
     def test_mixed_string_and_vector_raises(self):
         with pytest.raises(ValueError):
-            Load(fx=10, primary='x', secondary=[0, 1, 0])
+            Load(fx=10, primary="x", secondary=[0, 1, 0])
 
     def test_non_orthogonal_vectors_raises(self):
         with pytest.raises(ValueError):
@@ -168,6 +170,7 @@ class TestLoadArithmetic:
 # ===========================================================================
 # Force
 # ===========================================================================
+
 
 class TestForce:
     def test_construction(self):
@@ -218,6 +221,7 @@ class TestForce:
 # Moment
 # ===========================================================================
 
+
 class TestMoment:
     def test_construction(self):
         m = Moment(M=[0, 0, 100])
@@ -242,6 +246,7 @@ class TestMoment:
 # ===========================================================================
 # CombinedLoad
 # ===========================================================================
+
 
 class TestCombinedLoad:
     def test_sum_forces(self):

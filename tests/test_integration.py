@@ -1,4 +1,4 @@
-'''
+"""
 Integration tests for StructuralObject / Member.
 
 Uses only generic shapes and custom materials to avoid dependence on external
@@ -12,10 +12,9 @@ Stress formulas under pure axial load (no bending, shear, or torsion):
     => All four corners have identical uniaxial state: [0, 0, Sa, 0, 0, 0]
     => von_mises = Sa  (uniaxial)
     => max_shear = Sa/2
-'''
+"""
 
 import pytest
-import numpy as np
 from math import pi
 from metk.structural.member import Member
 from metk.shapes.generic import Circle, Rectangle
@@ -27,14 +26,17 @@ from metk.loads import Load
 # Fixtures
 # ===========================================================================
 
+
 @pytest.fixture
 def circle_shape():
-    return Circle(r=1)   # A = pi, Ix = Iy = J = pi/4
+    return Circle(r=1)  # A = pi, Ix = Iy = J = pi/4
 
 
 @pytest.fixture
 def steel():
-    return Material(**{'YS_min': 36000, 'UTS_min': 58000, 'modulus of elasticity': 29e6})
+    return Material(
+        **{"YS_min": 36000, "UTS_min": 58000, "modulus of elasticity": 29e6}
+    )
 
 
 @pytest.fixture
@@ -51,6 +53,7 @@ def axial_member(circle_shape, axial_load, steel):
 # Construction
 # ===========================================================================
 
+
 class TestMemberConstruction:
     def test_shape_assigned(self, axial_member, circle_shape):
         assert axial_member.shape is circle_shape
@@ -62,9 +65,21 @@ class TestMemberConstruction:
         assert axial_member.material is steel
 
     def test_construct_with_shape_dict(self, axial_load, steel):
-        m = Member(shape={'name': 'test', 'A': 5, 'Ix': 10, 'Iy': 10, 'J': 5,
-                          'cx_right': 1, 'cx_left': -1, 'cy_high': 1, 'cy_low': -1},
-                   loads=axial_load, material=steel)
+        m = Member(
+            shape={
+                "name": "test",
+                "A": 5,
+                "Ix": 10,
+                "Iy": 10,
+                "J": 5,
+                "cx_right": 1,
+                "cx_left": -1,
+                "cy_high": 1,
+                "cy_low": -1,
+            },
+            loads=axial_load,
+            material=steel,
+        )
         assert m.shape is not None
 
     def test_loads_created_from_kwargs(self, circle_shape, steel):
@@ -78,6 +93,7 @@ class TestMemberConstruction:
 # ===========================================================================
 # Pure axial stress
 # ===========================================================================
+
 
 class TestPureAxialStress:
     def test_sa_formula(self, axial_member):
@@ -120,6 +136,7 @@ class TestPureAxialStress:
 # Combined load: axial + bending
 # ===========================================================================
 
+
 class TestAxialPlusBending:
     def test_bending_adds_to_one_side_subtracts_from_other(self):
         shape = Rectangle(w=2, h=4)
@@ -128,9 +145,9 @@ class TestAxialPlusBending:
         m = Member(shape=shape, loads=load, material=Material(YS_min=36000))
         # cy_high = 2, cy_low = -2, Ix = (1/12)*2*4^3 = 128/12
         expected_high = 1000 * shape.cy_high / shape.Ix
-        expected_low  = 1000 * shape.cy_low  / shape.Ix
+        expected_low = 1000 * shape.cy_low / shape.Ix
         assert m.Sbx_high == pytest.approx(expected_high)
-        assert m.Sbx_low  == pytest.approx(expected_low)
+        assert m.Sbx_low == pytest.approx(expected_low)
         assert m.Sbx_high == pytest.approx(-m.Sbx_low)
 
     def test_max_stress_on_tension_side(self):
@@ -139,12 +156,15 @@ class TestAxialPlusBending:
         m = Member(shape=shape, loads=load, material=Material(YS_min=36000))
         # Tension side (high): Sa + Sbx_high
         # Compression side (low): Sa + Sbx_low (Sbx_low < 0)
-        assert m.Sbx_high > abs(m.Sbx_low) or m.Sbx_high == pytest.approx(abs(m.Sbx_low))
+        assert m.Sbx_high > abs(m.Sbx_low) or m.Sbx_high == pytest.approx(
+            abs(m.Sbx_low)
+        )
 
 
 # ===========================================================================
 # Output rendering
 # ===========================================================================
+
 
 class TestMemberOutput:
     def test_results_table_renders(self, axial_member):
@@ -154,13 +174,13 @@ class TestMemberOutput:
 
     def test_series_contains_sa(self, axial_member):
         s = axial_member.series
-        assert 'Sa' in s.index
+        assert "Sa" in s.index
 
     def test_series_sa_value(self, axial_member):
         s = axial_member.series
-        assert s['Sa'] == pytest.approx(1000 / pi)
+        assert s["Sa"] == pytest.approx(1000 / pi)
 
     def test_get_delegates_to_shape(self, axial_member):
         # get() should delegate shape properties via prop_lookup
-        A_via_get = axial_member.get('A')
+        A_via_get = axial_member.get("A")
         assert A_via_get == pytest.approx(pi)

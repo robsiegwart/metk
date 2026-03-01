@@ -1,19 +1,5 @@
-from .structural_shapes import (
-    W,
-    L,
-    HSS,
-    StructuralShape
-)
+from .structural_shapes import W, L, HSS, StructuralShape
 
-from .weld import (
-    LineWeld,
-    DoubleLineWeld,
-    BoxWeld
-)
+from .weld import LineWeld, DoubleLineWeld, BoxWeld
 
-from .generic import (
-    Shape,
-    HollowRectangle,
-    Circle,
-    Rectangle
-)
+from .generic import Shape, HollowRectangle, Circle, Rectangle

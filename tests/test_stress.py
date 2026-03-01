@@ -1,9 +1,9 @@
-'''
+"""
 Tests for StressElement.
 
 Principal stress values for simple states of stress have known closed-form
 solutions that are used as ground truth here.
-'''
+"""
 
 import pytest
 import numpy as np
@@ -13,6 +13,7 @@ from metk.stress.core import StressElement, SRSS
 # ===========================================================================
 # SRSS utility
 # ===========================================================================
+
 
 class TestSRSS:
     def test_single_value(self):
@@ -33,6 +34,7 @@ class TestSRSS:
 # StressElement construction
 # ===========================================================================
 
+
 class TestStressElementConstruction:
     def test_construct_from_6_component_list(self):
         s = StressElement([100, 0, 0, 0, 0, 0])
@@ -47,18 +49,14 @@ class TestStressElementConstruction:
         assert s.Sz == pytest.approx(20)
 
     def test_construct_from_3x3_matrix(self):
-        S = np.array([[100, 0, 0],
-                      [0,   0, 0],
-                      [0,   0, 0]])
+        S = np.array([[100, 0, 0], [0, 0, 0], [0, 0, 0]])
         s = StressElement(S)
         assert s.Sx == pytest.approx(100)
         assert s.Sy == pytest.approx(0)
         assert s.Sz == pytest.approx(0)
 
     def test_6_component_and_3x3_give_same_result(self):
-        S_3x3 = np.array([[100, 20,  5],
-                           [20,  50, 10],
-                           [5,   10, 30]])
+        S_3x3 = np.array([[100, 20, 5], [20, 50, 10], [5, 10, 30]])
         S_6 = [100, 50, 30, 20, 5, 10]
         s1 = StressElement(S_6)
         s2 = StressElement(S_3x3)
@@ -68,8 +66,8 @@ class TestStressElementConstruction:
         assert s1.Sxy == pytest.approx(s2.Sxy)
 
     def test_name_stored(self):
-        s = StressElement([0, 0, 0, 0, 0, 0], name='test')
-        assert s.name == 'test'
+        s = StressElement([0, 0, 0, 0, 0, 0], name="test")
+        assert s.name == "test"
 
     def test_shear_aliases(self):
         # Syx == Sxy, Szy == Syz, Sxz == Szx
@@ -83,15 +81,17 @@ class TestStressElementConstruction:
 # Uniaxial stress state — all answers known analytically
 # ===========================================================================
 
+
 class TestUniaxialStress:
-    '''
+    """
     S = [[100, 0, 0], [0, 0, 0], [0, 0, 0]]
     Eigenvalues: 100, 0, 0
     P1=100, P2=0, P3=0
     von_mises = 100
     max_shear = tau1 = (P1-P3)/2 = 50
     intensity = max(|P1-P2|, |P2-P3|, |P3-P1|) = 100
-    '''
+    """
+
     @pytest.fixture
     def uniaxial(self):
         return StressElement([100, 0, 0, 0, 0, 0])
@@ -124,14 +124,16 @@ class TestUniaxialStress:
 # Hydrostatic stress state — all principals equal, no shear, zero von Mises
 # ===========================================================================
 
+
 class TestHydrostaticStress:
-    '''
+    """
     S = 50*I (identity)
     P1 = P2 = P3 = 50
     von_mises = 0
     max_shear = 0
     intensity = 0
-    '''
+    """
+
     @pytest.fixture
     def hydrostatic(self):
         return StressElement([50, 50, 50, 0, 0, 0])
@@ -156,15 +158,17 @@ class TestHydrostaticStress:
 # Pure shear stress state
 # ===========================================================================
 
+
 class TestPureShear:
-    '''
+    """
     S = [[0, tau, 0], [tau, 0, 0], [0, 0, 0]]  with tau=100
     Eigenvalues: +100, -100, 0
     P1=100, P2=0, P3=-100
     von_mises = sqrt(0.5*(200^2 + 100^2 + 100^2)) = sqrt(0.5*60000) = sqrt(30000)
               = 100*sqrt(3) ≈ 173.2
     max_shear = (P1-P3)/2 = 100
-    '''
+    """
+
     @pytest.fixture
     def pure_shear(self):
         # [Sx, Sy, Sz, Sxy, Szx, Syz] -> Sxy=tau=100, rest=0
@@ -186,6 +190,7 @@ class TestPureShear:
 # ===========================================================================
 # Symmetric stress tensor (S matrix should be symmetric)
 # ===========================================================================
+
 
 class TestSymmetry:
     def test_s_matrix_is_symmetric(self):

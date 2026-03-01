@@ -1,4 +1,4 @@
-'''
+"""
 Download and parse structural shapes database from AISC and save to a SQLite
 database. The source data is available at:
 
@@ -11,7 +11,7 @@ each type as a table in a SQLite database at:
 
 Run this script whenever the upstream database is updated. The output file is
 committed to the repository in place of the previous per-type pickle files.
-'''
+"""
 
 import os
 import sqlite3
@@ -19,18 +19,19 @@ import pandas as pd
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-DB_URL  = 'https://cloud.aisc.org/biggie_bin/aisc-shapes-database-v160-2.xlsx'
-OUT_PATH = os.path.join('..', 'structural_shape_data', 'shapes.db')
+DB_URL = "https://cloud.aisc.org/biggie_bin/aisc-shapes-database-v160-2.xlsx"
+OUT_PATH = os.path.join("..", "structural_shape_data", "shapes.db")
 
-print('Downloading AISC shapes database...')
-data = pd.read_excel(DB_URL, sheet_name='Database v16.0')
-print(f'  {len(data)} rows, {len(data.columns)} columns')
+print("Downloading AISC shapes database...")
+data = pd.read_excel(DB_URL, sheet_name="Database v16.0")
+print(f"  {len(data)} rows, {len(data.columns)} columns")
 
-shape_types = sorted(data['Type'].dropna().unique())
-print(f'  Shape types: {shape_types}')
+shape_types = sorted(data["Type"].dropna().unique())
+print(f"  Shape types: {shape_types}")
+
 
 def dedup_columns(df):
-    '''
+    """
     Rename columns that are case-insensitive duplicates of each other.
 
     SQLite column names are case-insensitive, so a DataFrame with both 'B' and
@@ -38,7 +39,7 @@ def dedup_columns(df):
     duplicate is renamed by appending '_1', '_2', etc.
 
     Returns (renamed_df, renames_dict).
-    '''
+    """
     seen = {}
     new_cols = []
     renames = {}
@@ -47,7 +48,7 @@ def dedup_columns(df):
         if key in seen:
             n = seen[key]
             seen[key] += 1
-            new_name = f'{col}_{n}'
+            new_name = f"{col}_{n}"
             renames[col] = new_name
             new_cols.append(new_name)
         else:
@@ -60,18 +61,18 @@ def dedup_columns(df):
 
 data, renames = dedup_columns(data)
 if renames:
-    print(f'  Column renames (SQLite case conflict): {renames}')
+    print(f"  Column renames (SQLite case conflict): {renames}")
 
-print(f'\nWriting to {os.path.abspath(OUT_PATH)}')
+print(f"\nWriting to {os.path.abspath(OUT_PATH)}")
 with sqlite3.connect(OUT_PATH) as conn:
     for shape_type in shape_types:
-        subset = data[data['Type'] == shape_type].reset_index(drop=True)
+        subset = data[data["Type"] == shape_type].reset_index(drop=True)
         # Drop columns with no data for this shape type. The AISC spreadsheet
         # uses an en dash (–, U+2013) for non-applicable properties, sometimes
         # mixed with NaN, so treat both as empty.
-        empty = ((subset == '\u2013') | subset.isna()).all()
+        empty = ((subset == "\u2013") | subset.isna()).all()
         subset = subset.loc[:, ~empty]
-        subset.to_sql(shape_type, conn, if_exists='replace', index=False)
-        print(f'  {shape_type:<6} {len(subset)} shapes, {len(subset.columns)} columns')
+        subset.to_sql(shape_type, conn, if_exists="replace", index=False)
+        print(f"  {shape_type:<6} {len(subset)} shapes, {len(subset.columns)} columns")
 
-print('\nDone.')
+print("\nDone.")

@@ -1,19 +1,27 @@
-'''
+"""
 Tests for generic shape classes: Circle, Rectangle, HollowRectangle.
 
 All assertions use exact or approximate arithmetic derived from the formulas
 in each class, so failures directly indicate a formula regression.
-'''
+"""
 
 import pytest
 from math import pi, sqrt
 from metk.shapes.generic import Circle, Rectangle, HollowRectangle
-from metk.shapes.structural_shapes import W, HSS, L, StructuralShape, is_structural_shape_label, _GenericStandardShape
+from metk.shapes.structural_shapes import (
+    W,
+    HSS,
+    L,
+    StructuralShape,
+    is_structural_shape_label,
+    _GenericStandardShape,
+)
 
 
 # ===========================================================================
 # Circle
 # ===========================================================================
+
 
 class TestCircle:
     def test_radius_stored(self):
@@ -74,12 +82,13 @@ class TestCircle:
 
     def test_prop_dict_keys(self):
         c = Circle(r=5)
-        assert set(c.prop_dict.keys()) == {'d', 'r', 'A', 'Ix', 'Zx', 'J'}
+        assert set(c.prop_dict.keys()) == {"d", "r", "A", "Ix", "Zx", "J"}
 
 
 # ===========================================================================
 # Rectangle
 # ===========================================================================
+
 
 class TestRectangle:
     def test_area(self):
@@ -89,22 +98,22 @@ class TestRectangle:
     def test_second_moment_x(self):
         r = Rectangle(w=4, h=6)
         # Ix = (1/12) * w * h^3
-        assert r.Ix == pytest.approx(1/12 * 4 * 6**3)   # 72
+        assert r.Ix == pytest.approx(1 / 12 * 4 * 6**3)  # 72
 
     def test_second_moment_y(self):
         r = Rectangle(w=4, h=6)
         # Iy = (1/12) * h * w^3
-        assert r.Iy == pytest.approx(1/12 * 6 * 4**3)   # 32
+        assert r.Iy == pytest.approx(1 / 12 * 6 * 4**3)  # 32
 
     def test_plastic_section_modulus_x(self):
         r = Rectangle(w=4, h=6)
         # Zx = w*h^2/4
-        assert r.Zx == pytest.approx(4 * 6**2 / 4)      # 36
+        assert r.Zx == pytest.approx(4 * 6**2 / 4)  # 36
 
     def test_plastic_section_modulus_y(self):
         r = Rectangle(w=4, h=6)
         # Zy = h*w^2/4
-        assert r.Zy == pytest.approx(6 * 4**2 / 4)      # 24
+        assert r.Zy == pytest.approx(6 * 4**2 / 4)  # 24
 
     def test_elastic_section_modulus_x(self):
         r = Rectangle(w=4, h=6)
@@ -148,6 +157,7 @@ class TestRectangle:
 # ===========================================================================
 # HollowRectangle
 # ===========================================================================
+
 
 class TestHollowRectangle:
     def test_area(self):
@@ -200,31 +210,32 @@ class TestHollowRectangle:
 # supported shape type.
 # ===========================================================================
 
+
 class TestStructuralShapeLabels:
     def test_w_label_recognised(self):
-        assert is_structural_shape_label('W8X31')
+        assert is_structural_shape_label("W8X31")
 
     def test_hss_label_recognised(self):
-        assert is_structural_shape_label('HSS6X6X.375')
+        assert is_structural_shape_label("HSS6X6X.375")
 
     def test_l_label_recognised(self):
-        assert is_structural_shape_label('L6X6X1/2')
+        assert is_structural_shape_label("L6X6X1/2")
 
     def test_invalid_string_not_recognised(self):
         # 'ROUNDBAR' contains no valid type-code prefix (W, L, HSS, …) followed
         # by digits, so the regex must not match it.
-        assert not is_structural_shape_label('ROUNDBAR')
+        assert not is_structural_shape_label("ROUNDBAR")
 
     def test_empty_string_not_recognised(self):
-        assert not is_structural_shape_label('')
+        assert not is_structural_shape_label("")
 
 
 class TestWShape:
-    '''W8X31 properties from AISC Shapes Database v16.0.'''
+    """W8X31 properties from AISC Shapes Database v16.0."""
 
-    @pytest.fixture(scope='class')
+    @pytest.fixture(scope="class")
     def shape(self):
-        return W('W8X31')
+        return W("W8X31")
 
     def test_cross_sectional_area(self, shape):
         assert shape.A == pytest.approx(9.13, rel=1e-3)
@@ -242,15 +253,15 @@ class TestWShape:
         assert shape.Sy == pytest.approx(9.27, rel=1e-3)
 
     def test_repr_contains_name(self, shape):
-        assert 'W8X31' in repr(shape)
+        assert "W8X31" in repr(shape)
 
 
 class TestHSSShape:
-    '''HSS6X6X.375 properties from AISC Shapes Database v16.0.'''
+    """HSS6X6X.375 properties from AISC Shapes Database v16.0."""
 
-    @pytest.fixture(scope='class')
+    @pytest.fixture(scope="class")
     def shape(self):
-        return HSS('HSS6X6X.375')
+        return HSS("HSS6X6X.375")
 
     def test_cross_sectional_area(self, shape):
         assert shape.A == pytest.approx(7.58, rel=1e-3)
@@ -266,15 +277,15 @@ class TestHSSShape:
         assert shape.Iy == pytest.approx(shape.Ix, rel=1e-3)
 
     def test_repr_contains_name(self, shape):
-        assert 'HSS6X6X.375' in repr(shape)
+        assert "HSS6X6X.375" in repr(shape)
 
 
 class TestLShape:
-    '''L6X6X1/2 properties from AISC Shapes Database v16.0.'''
+    """L6X6X1/2 properties from AISC Shapes Database v16.0."""
 
-    @pytest.fixture(scope='class')
+    @pytest.fixture(scope="class")
     def shape(self):
-        return L('L6X6X1/2')
+        return L("L6X6X1/2")
 
     def test_cross_sectional_area(self, shape):
         assert shape.A == pytest.approx(5.77, rel=1e-3)
@@ -290,30 +301,30 @@ class TestLShape:
         assert shape.Iy == pytest.approx(shape.Ix, rel=1e-3)
 
     def test_repr_contains_name(self, shape):
-        assert 'L6X6X1/2' in repr(shape)
+        assert "L6X6X1/2" in repr(shape)
 
 
 class TestStructuralShapeFactory:
     def test_w_shape_returns_w_instance(self):
-        assert isinstance(StructuralShape('W8X31'), W)
+        assert isinstance(StructuralShape("W8X31"), W)
 
     def test_hss_shape_returns_hss_instance(self):
-        assert isinstance(StructuralShape('HSS6X6X.375'), HSS)
+        assert isinstance(StructuralShape("HSS6X6X.375"), HSS)
 
     def test_l_shape_returns_l_instance(self):
-        assert isinstance(StructuralShape('L6X6X1/2'), L)
+        assert isinstance(StructuralShape("L6X6X1/2"), L)
 
     def test_invalid_label_raises(self):
         with pytest.raises(Exception):
-            StructuralShape('ROUNDBAR')
+            StructuralShape("ROUNDBAR")
 
     def test_unregistered_type_returns_generic_instance(self):
-        mc = StructuralShape('MC12X50')
+        mc = StructuralShape("MC12X50")
         assert isinstance(mc, _GenericStandardShape)
 
     def test_generic_shape_property_access(self):
         # MC12X50 values from AISC Shapes Database v16.0
-        mc = StructuralShape('MC12X50')
-        assert mc.A  == pytest.approx(14.7, rel=1e-3)
+        mc = StructuralShape("MC12X50")
+        assert mc.A == pytest.approx(14.7, rel=1e-3)
         assert mc.Ix == pytest.approx(269.0, rel=1e-3)
-        assert mc.Sx == pytest.approx(44.9,  rel=1e-3)
+        assert mc.Sx == pytest.approx(44.9, rel=1e-3)
