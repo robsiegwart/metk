@@ -3,14 +3,16 @@ Standard structural shape classes.
 '''
 
 import re
+import sqlite3
 import os.path
 from numpy import isreal, sqrt
-from pandas import read_pickle
+from pandas import read_sql
 from metk.shapes.base import BaseShape
 from metk.core import standardized
 
 
 local_dir = os.path.dirname(__file__)
+_DB_PATH = os.path.join(local_dir, 'structural_shape_data', 'shapes.db')
 
 
 LABEL_RE = re.compile(r'(?P<type>HSS|W|L|WT|C|2L|HP|M|MC|MT|S|ST|PIPE)[0-9.\/xX]+')
@@ -29,7 +31,7 @@ def is_structural_shape_label(name):
 def validate_structural_shape_name(name):
     '''
     Attempt to convert a user-supplied structural shape name to a valid name as
-    contained in the ``aisc-shapes-database-v15.0.xlsx`` which is the source of
+    contained in the ``aisc-shapes-database-v160-2.xlsx`` which is the source of
     data for this module.
     
     There are two naming conventions as defined by columns
@@ -41,23 +43,10 @@ def validate_structural_shape_name(name):
         
         "https://www.aisc.org/publications/steel-construction-manual-resources"
 
-    NOTE:   This function is currently a placeholder as this logic has not been
+    TODO:   This function is currently a placeholder as this logic has not been
             implemented yet.
     '''
     return name.strip().upper().replace(' ','')
-
-
-def get_standard_shape(name):
-    '''Return a named shape class by string lookup.'''
-    try:
-        type_ = LABEL_RE.search(name).group('type')
-        return {
-            'W':    W,
-            'L':    L,
-            'HSS':  HSS,            
-        }[type_](name)
-    except (AttributeError, KeyError):
-        return None
 
 
 class StandardShape(BaseShape):
@@ -66,11 +55,13 @@ class StandardShape(BaseShape):
         name = name if name.startswith(self.label) else self.label + name
         self.name = validate_structural_shape_name(name)
         
-        if not hasattr(self, 'src'):
-            m = LABEL_RE.search(self.name)
-            self.src = m.group('type') + '.pkl'
+        if not hasattr(self, 'table'):
+            self.table = LABEL_RE.search(self.name).group('type')
 
-        self._db = read_pickle(os.path.join(local_dir, 'structural_shape_data', self.src)).set_index('EDI_Std_Nomenclature')
+        with sqlite3.connect(_DB_PATH) as conn:
+            self._db = read_sql(
+                f'SELECT * FROM "{self.table}"', conn
+            ).set_index('EDI_Std_Nomenclature')
     
         try:
             data = self._db.loc[self.name]
@@ -191,7 +182,7 @@ class W(StandardShape):
         thickness of flange
     '''
     label = 'W'
-    src = 'W.pkl'
+    table = 'W'
     _properties = StandardShape._properties + ['tf','tw']
     _width_prop = 'bf'
     _height_prop = 'd'
@@ -235,9 +226,9 @@ class L(StandardShape):
     '''
     _stress_locations = ['lower left', 'upper left', 'lower right']
     label = 'L'
-    src = 'L.pkl'
+    table = 'L'
     _properties = StandardShape._properties + ['t']
-    _width_prop = 'b'
+    _width_prop = 'b_1'
     _height_prop = 'd'
     
     @property
@@ -250,7 +241,7 @@ class L(StandardShape):
     
     @property
     def cy_high(self):
-        return self.b - self.y
+        return self.b_1 - self.y
     
     @property
     def cy_low(self):
@@ -266,7 +257,7 @@ class L(StandardShape):
     
     @property
     def width_to_thickness(self):
-        return self.b/self.t
+        return self.b_1/self.t
     
     def __repr__(self):
         return f'L section ({self.name})'
@@ -305,15 +296,15 @@ class HSS(StandardShape):
         Depth of flat wall
     B
         Overall width
-    b
-        Width of flat wall
+    b_1
+        Width of flat wall (stored as ``b_1`` due to SQLite case-insensitivity conflict with ``B``)
     t_nom
         Nominal wall thickness
     t_des
         Design wall thickness
     '''
     label = 'HSS'
-    src = 'HSS.pkl'
+    table = 'HSS'
     _properties = StandardShape._properties + ['tnom','tdes']
     _width_prop = 'B'
     _height_prop = 'Ht'
@@ -334,7 +325,7 @@ class HSS(StandardShape):
     @property
     def width_to_thickness(self):
         '''Per AISC Table B4.1a'''
-        return max(self.b, self.h)/self.tnom
+        return max(self.b_1, self.h)/self.tnom
     
     @property
     def h_x(self):
@@ -345,6 +336,40 @@ class HSS(StandardShape):
     def h_y(self):
         '''See AISC G4 ...'''
         return self.height - 3*self.t
+
+
+class _GenericStandardShape(StandardShape):
+    '''
+    Generic fallback for shape types without a dedicated subclass.
+
+    Supports scalar property access from the database (A, Ix, Sx, …) for any
+    shape type present in shapes.db. Geometry helpers (width, height, cx_right,
+    …) and compactness checks are not implemented — add a dedicated subclass
+    when those are needed.
+    '''
+    label = ''
+
+    def __init__(self, name):
+        name = validate_structural_shape_name(name)
+        self.table = LABEL_RE.search(name).group('type')
+        super().__init__(name)
+
+    def __repr__(self):
+        return f'Standard shape {self.name}'
+
+
+def get_standard_shape(name):
+    '''Return a named shape class by string lookup.'''
+    try:
+        type_ = LABEL_RE.search(name).group('type')
+        cls = {
+            'W':    W,
+            'L':    L,
+            'HSS':  HSS,
+        }.get(type_, _GenericStandardShape)
+        return cls(name)
+    except AttributeError:
+        return None
 
 
 def StructuralShape(name):
