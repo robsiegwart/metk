@@ -111,23 +111,16 @@ attributes:
 >>> print(shape.Ix)
 72.0
 >>> print(shape.properties)
-+--------+------+
-| A      | 24   |
-+--------+------+
-| height | 6    |
-+--------+------+
-| width  | 4    |
-+--------+------+
-| Ix     | 72   |
-+--------+------+
-| Iy     | 32   |
-+--------+------+
-| J      | 75.1 |
-+--------+------+
-| cx_max | 2    |
-+--------+------+
-| cy_max | 3    |
-+--------+------+
+------  ----
+A       24
+height  6
+width   4
+Ix      72
+Iy      32
+J       75.1
+cx_max  2
+cy_max  3
+------  ----
 ```
 
 Importing a standard shape from the AISC shapes library:
@@ -138,27 +131,18 @@ Importing a standard shape from the AISC shapes library:
 >>> print(shape.A)
 0.84
 >>> print(shape.properties)
-+--------+-------+
-| A      | 0.84  |
-+--------+-------+
-| height | 2     |
-+--------+-------+
-| width  | 2     |
-+--------+-------+
-| Ix     | 0.486 |
-+--------+-------+
-| Iy     | 0.486 |
-+--------+-------+
-| J      | 0.796 |
-+--------+-------+
-| cx_max | 1     |
-+--------+-------+
-| cy_max | 1     |
-+--------+-------+
-| tnom   | 0.125 |
-+--------+-------+
-| tdes   | 0.116 |
-+--------+-------+
+------  -----
+A       0.84 
+height  2    
+width   2    
+Ix      0.486
+Iy      0.486
+J       0.796
+cx_max  1    
+cy_max  1    
+tnom    0.125
+tdes    0.116
+------  -----
 ```
 
 ### Materials
@@ -196,17 +180,13 @@ English Engineering units):
 >>> from metk import NamedMaterial
 >>> material = NamedMaterial('A572-60')
 >>> print(material.properties)
-+-----------------------+------------+
-| density               | 0.282      |
-+-----------------------+------------+
-| YS_min                | 60200      |
-+-----------------------+------------+
-| UTS_min               | 75400      |
-+-----------------------+------------+
-| modulus of elasticity | 29000000.0 |
-+-----------------------+------------+
-| elongation            | 0.16       |
-+-----------------------+------------+
+---------------------  ----------
+density                0.282     
+YS_min                 60200     
+UTS_min                75400     
+modulus of elasticity  29000000.0
+elongation             0.16      
+---------------------  ----------
 >>> print(material.YS)
 60200
 >>> print(material.Fy)

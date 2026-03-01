@@ -40,7 +40,7 @@ class BaseMaterial(metkObject):
     @property
     def properties(self):
         return tabulate(
-            self._data["properties"].items(), tablefmt="grid", disable_numparse=True
+            self._data["properties"].items(), tablefmt="simple", disable_numparse=True
         )
 
     def __repr__(self):

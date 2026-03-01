@@ -31,7 +31,7 @@ class metkObject:
                 ", ".join(str(x) for x in v) if isinstance(v, list) else nformat(v)
             )
             rows.append([prop, formatted])
-        return tabulate(rows, tablefmt="grid", numalign="left")
+        return tabulate(rows, tablefmt="simple", numalign="left")
 
     @property
     def prop_dict(self) -> Dict[str, Any]:
