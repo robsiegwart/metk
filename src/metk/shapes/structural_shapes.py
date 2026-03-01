@@ -378,7 +378,7 @@ def get_standard_shape(name):
 
 def StructuralShape(name):
     """
-    Return a structural shape class based on nane.
+    Return a structural shape class based on its name.
 
     :param str name:    A valid structural shape name (such as 'HSS6X10X.375' or 'L6X6X1/2')
     """
