@@ -407,7 +407,6 @@ class StructuralObjectGroup(Collection):
         """
         result = DataFrame([item.series for item in self.objects])
         result.dropna(axis=1, how="all", inplace=True)
-        new_cols = self.sort_cols(result.columns.to_list())
         result = result[self.sort_cols(result.columns.to_list())]
         self.result = result
         return result
