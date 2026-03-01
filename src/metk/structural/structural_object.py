@@ -7,7 +7,8 @@ structural elements like `Weld`, `Member`, and `Bolt`.
 from functools import cached_property
 from collections.abc import Collection
 from pandas import DataFrame, Series
-from metk.core import *
+from metk.core import metkObject, prop_lookup, nformat
+from tabulate import tabulate
 import metk.props
 from metk.stress import StressElement
 from metk.materials import Material, NamedMaterial
@@ -364,7 +365,7 @@ class StructuralObject(metkObject):
         formatted = {
             k: v if isinstance(v, str) else nformat(v) for k, v in resdict.items()
         }
-        return tabulate(formatted.items())
+        return tabulate(formatted.items(), tablefmt="simple")
 
 
 class StructuralObjectGroup(Collection):
