@@ -81,10 +81,6 @@ class TestLoadConstruction:
         assert load.primary == 'x'
         assert load.secondary == 'y'
 
-    def test_not_transformed_by_default(self):
-        load = Load(fx=10)
-        assert load.transformed is False
-
     def test_force_array(self):
         load = Load(fx=1, fy=2, fz=3)
         np.testing.assert_array_equal(load.force, [1, 2, 3])
@@ -103,21 +99,51 @@ class TestLoadConstruction:
 
 
 class TestLoadCoordinateTransform:
-    def test_untransformed_returns_raw_values(self):
+    def test_identity_returns_raw_values(self):
         load = Load(fx=10, fy=5, fz=2, primary='x', secondary='y')
         assert load.fx == 10
         assert load.fy == 5
         assert load.fz == 2
 
-    def test_transformed_flag_set(self):
-        load = Load(fx=10, primary='y', secondary='x')
-        assert load.transformed is True
-
     def test_y_primary_x_secondary_remaps_fx_fy(self):
-        # primary='y', secondary='x': f_x maps to f_y, f_y maps to f_x, f_z negated
-        # From _load_map['y']['x']: f_x->f_y, f_y->f_x, f_z->-f_z
+        # local x = global y, local y = global x
+        # A global fy=10 appears as fx in the local frame
         load = Load(fx=0, fy=10, fz=0, primary='y', secondary='x')
         assert load.fx == pytest.approx(10)
+
+    def test_vector_input_identity(self):
+        load = Load(fx=10, fy=5, fz=2, primary=[1, 0, 0], secondary=[0, 1, 0])
+        assert load.fx == pytest.approx(10)
+        assert load.fy == pytest.approx(5)
+        assert load.fz == pytest.approx(2)
+
+    def test_vector_input_arbitrary_rotation(self):
+        # Local frame rotated 45° around global z
+        angle = np.pi / 4
+        x_loc = [np.cos(angle), np.sin(angle), 0]
+        y_loc = [-np.sin(angle), np.cos(angle), 0]
+        load = Load(fx=10, primary=x_loc, secondary=y_loc)
+        assert load.fx == pytest.approx(10 * np.cos(angle))
+        assert load.fy == pytest.approx(-10 * np.sin(angle))
+        assert load.fz == pytest.approx(0)
+
+    def test_vector_input_unnormalized_is_normalised(self):
+        # Passing a non-unit vector should still work (normalised internally)
+        load_unit = Load(fx=10, primary=[1, 0, 0], secondary=[0, 1, 0])
+        load_scaled = Load(fx=10, primary=[5, 0, 0], secondary=[0, 3, 0])
+        assert load_unit.fx == pytest.approx(load_scaled.fx)
+
+    def test_mixed_string_and_vector_raises(self):
+        with pytest.raises(ValueError):
+            Load(fx=10, primary='x', secondary=[0, 1, 0])
+
+    def test_non_orthogonal_vectors_raises(self):
+        with pytest.raises(ValueError):
+            Load(fx=10, primary=[1, 0, 0], secondary=[1, 1, 0])
+
+    def test_zero_vector_raises(self):
+        with pytest.raises(ValueError):
+            Load(fx=10, primary=[0, 0, 0], secondary=[0, 1, 0])
 
 
 class TestLoadArithmetic:

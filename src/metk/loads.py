@@ -39,66 +39,30 @@ class Factor:
 class Load(metkObject):
     '''
     A generic load containing force and moment components. Loads can be
-    transformed to other coordinate systems at 90 degree rotations by specifying
-    direction axes.
+    transformed to an arbitrary local coordinate system by specifying the
+    directions of the local x and y axes (``primary`` and ``secondary``).
+    Axes may be given as string labels (``'x'``, ``'-z'``, etc.) or as
+    arbitrary orthogonal unit vectors.
     '''
     _load_re = re.compile(r'^-?[xyz]$')
     """regex for load labels such as '-x','y','-z' ... """
     
     _properties = ['f_x','f_y','f_z','m_x','m_y','m_z','primary','secondary']
     
-    # ``_load_map`` is used for transforming loads from the global coordinate
-    # system to another coordinate system aligned with the global csys but
-    # rotated by 90, 180, 270 degrees; this is done by specifying two axes:
-    #   - the first is the axis which the local element's x-axis points in;
-    #   - the second is the axis which the local element's y-axis points in
-    _load_map = { 'x': {
-                     'y': {'f_x': 'f_x', 'f_y': 'f_y', 'f_z': 'f_z',   'm_x': 'm_x', 'm_y': 'm_y', 'm_z': 'm_z'},
-                    '-y': {'f_x': 'f_x', 'f_y':'-f_y', 'f_z':'-f_z',   'm_x': 'm_x', 'm_y':'-m_y', 'm_z':'-m_z'},
-                     'z': {'f_x': 'f_x', 'f_y':'-f_z', 'f_z': 'f_y',   'm_x': 'm_x', 'm_y':'-m_z', 'm_z': 'm_y'},
-                    '-z': {'f_x': 'f_x', 'f_y': 'f_z', 'f_z':'-f_y',   'm_x': 'm_x', 'm_y': 'm_z', 'm_z':'-m_y'} },
-                  '-x': {
-                     'y': {'f_x':'-f_x', 'f_y': 'f_y', 'f_z':'-f_z',   'm_x':'-m_x', 'm_y': 'm_y', 'm_z':'-m_z'},
-                    '-y': {'f_x':'-f_x', 'f_y':'-f_y', 'f_z': 'f_z',   'm_x':'-m_x', 'm_y':'-m_y', 'm_z': 'm_z'},
-                     'z': {'f_x':'-f_x', 'f_y':'-f_z', 'f_z': 'f_y',   'm_x':'-m_x', 'm_y':'-m_z', 'm_z': 'm_y'},
-                    '-z': {'f_x':'-f_x', 'f_y': 'f_z', 'f_z':'-f_y',   'm_x':'-m_x', 'm_y': 'm_z', 'm_z':'-m_y'} },
-                  'y': {
-                     'x': {'f_x': 'f_y', 'f_y': 'f_x', 'f_z':'-f_z',   'm_x': 'm_y', 'm_y': 'm_x', 'm_z':'-m_z'},
-                    '-x': {'f_x':'-f_y', 'f_y': 'f_x', 'f_z': 'f_z',   'm_x':'-m_y', 'm_y': 'm_x', 'm_z': 'm_z'},
-                     'z': {'f_x': 'f_y', 'f_y': 'f_z', 'f_z': 'f_x',   'm_x': 'm_y', 'm_y': 'm_z', 'm_z': 'm_x'},
-                    '-z': {'f_x':'-f_y', 'f_y': 'f_z', 'f_z':'-f_x',   'm_x':'-m_y', 'm_y': 'm_z', 'm_z':'-m_x'} },
-                  '-y': {
-                     'x': {'f_x': 'f_y', 'f_y': 'f_x', 'f_z': 'f_z',   'm_x': 'm_y', 'm_y': 'm_x', 'm_z': 'm_z'},
-                    '-x': {'f_x':'-f_y', 'f_y': 'f_x', 'f_z':'-f_z',   'm_x':'-m_y', 'm_y': 'm_x', 'm_z':'-m_z'},
-                     'z': {'f_x':'-f_y', 'f_y': 'f_z', 'f_z':'-f_x',   'm_x':'-m_y', 'm_y': 'm_z', 'm_z':'-m_x'},
-                    '-z': {'f_x': 'f_y', 'f_y': 'f_z', 'f_z': 'f_x',   'm_x': 'm_y', 'm_y': 'm_z', 'm_z': 'm_x'} },
-                  'z': {
-                     'x': {'f_x': 'f_z', 'f_y': 'f_x', 'f_z': 'f_y',   'm_x': 'm_z', 'm_y': 'm_x', 'm_z': 'm_y'},
-                    '-x': {'f_x':'-f_z', 'f_y':'-f_x', 'f_z': 'f_y',   'm_x':'-m_z', 'm_y':'-m_x', 'm_z': 'm_y'},
-                     'y': {'f_x': 'f_z', 'f_y': 'f_y', 'f_z':'-f_x',   'm_x': 'm_z', 'm_y': 'm_y', 'm_z':'-m_x'},
-                    '-y': {'f_x':'-f_z', 'f_y':'-f_y', 'f_z':'-f_x',   'm_x':'-m_z', 'm_y':'-m_y', 'm_z':'-m_x'} },
-                  '-z': {
-                     'x': {'f_x':'-f_z', 'f_y': 'f_x', 'f_z':'-f_y',   'm_x':'-m_z', 'm_y': 'm_x', 'm_z':'-m_y'},
-                    '-x': {'f_x': 'f_z', 'f_y':'-f_x', 'f_z':'-f_y',   'm_x': 'm_z', 'm_y':'-m_x', 'm_z':'-m_y'},
-                     'y': {'f_x':'-f_z', 'f_y': 'f_y', 'f_z': 'f_x',   'm_x':'-m_z', 'm_y': 'm_y', 'm_z': 'm_x'},
-                    '-y': {'f_x': 'f_z', 'f_y':'-f_y', 'f_z': 'f_x',   'm_x': 'm_z', 'm_y':'-m_y', 'm_z': 'm_x'} }
-        }
+    # Maps axis label strings to their corresponding global unit vectors.
+    # Used by ``_parse_axes`` when string labels are provided.
+    _axis_vectors = {
+        'x':  np.array([ 1.,  0.,  0.]),
+        '-x': np.array([-1.,  0.,  0.]),
+        'y':  np.array([ 0.,  1.,  0.]),
+        '-y': np.array([ 0., -1.,  0.]),
+        'z':  np.array([ 0.,  0.,  1.]),
+        '-z': np.array([ 0.,  0., -1.]),
+    }
     
     _coords = {
         'f_x': 0, 'f_y': 1, 'f_z': 2, 'm_x': 3, 'm_y': 4, 'm_z': 5
     }
-
-    def _to_local(self, primary, secondary, input_load):
-        """Return a transformed load value"""
-        mapping = self._load_map[primary][secondary]
-        target = mapping[input_load]
-        target_sign = -1 if len(target.split('-')) > 1 else 1
-        target_stub = target.split('-')[-1]
-        return target_sign*self._raw_value[self._coords[target_stub]]
-    
-    def _is_valid_combination(self, primary, secondary):
-        """Check if a primary/secondary input pair is valid"""
-        return primary.split('-')[-1] != secondary.split('-')[-1]
 
     def __init__(self, *args, **kwargs):
         kwargs = {k.lower().replace('_',''):v for k,v in kwargs.items()}
@@ -120,14 +84,114 @@ class Load(metkObject):
         self.secondary = kwargs.get('secondary','y')
         self.name = kwargs.get('name','<unnamed>').capitalize()
 
-        if not self._load_re.search(self.primary) or not self._load_re.search(self.secondary):
-            raise Exception
-        
-        if not self._is_valid_combination(self.primary, self.secondary):
-            raise Exception(f'Load orientations are not a valid combination (primary={self.primary}, secondary={self.secondary})')
+        self._x_local, self._y_local = self._parse_axes(self.primary, self.secondary)
 
-        self.transformed = False if self.primary == 'x' and self.secondary == 'y' else True
-    
+    def _parse_axes(self, primary, secondary):
+        '''
+        Normalize primary and secondary axis inputs to unit vectors.
+
+        Both inputs must be string labels (e.g. ``'x'``, ``'-z'``) or both
+        must be array-like unit vectors — mixed types are not allowed.
+
+        Returns ``(x_local, y_local)`` as unit numpy arrays.
+
+        Performs checks to ensure vectors are 3D, non-zero, and orthogonal, and
+        raises ValueError if any checks fail.
+        '''
+        p_is_str = isinstance(primary, str)
+        s_is_str = isinstance(secondary, str)
+        # Reject mixed input types — both must be strings or both vectors
+        if p_is_str != s_is_str:
+            raise ValueError(
+                'primary and secondary must both be string labels or both be vectors'
+            )
+        if p_is_str:
+            # String label path: validate against '-?[xyz]' and look up the
+            # corresponding unit vector from the class-level table
+            if not self._load_re.search(primary) or not self._load_re.search(secondary):
+                raise ValueError("Invalid axis label — must match '-?[xyz]'")
+            x_loc = self._axis_vectors[primary]
+            y_loc = self._axis_vectors[secondary]
+        else:
+            # Arbitrary vector path: convert to arrays, reject zero vectors,
+            # then normalize to unit length so the rotation matrix is orthogonal
+            x_loc = np.asarray(primary, dtype=float)
+            y_loc = np.asarray(secondary, dtype=float)
+            if x_loc.shape != (3,) or y_loc.shape != (3,):
+                raise ValueError('Axis vectors must be 3-dimensional')
+            norm_p, norm_s = np.linalg.norm(x_loc), np.linalg.norm(y_loc)
+            if np.isclose(norm_p, 0) or np.isclose(norm_s, 0):
+                raise ValueError('Axis vectors must not be zero vectors')
+            x_loc, y_loc = x_loc / norm_p, y_loc / norm_s
+        # Final check shared by both paths: axes must be perpendicular,
+        # i.e. their dot product must be zero, otherwise they cannot form
+        # a valid orthogonal coordinate frame
+        if not np.isclose(np.dot(x_loc, y_loc), 0.0):
+            raise ValueError(
+                f'primary and secondary axes are not orthogonal '
+                f'(dot product = {np.dot(x_loc, y_loc):.6f})'
+            )
+        return x_loc, y_loc
+
+    def _build_rotation_matrix(self, x_local, y_local):
+        '''
+        Build a rotation matrix from orthogonal local x and y unit vectors.
+
+        The local z-axis is derived from the cross product. Columns of the
+        returned matrix are the local basis vectors expressed in the global
+        frame, so ``R.T @ v_global`` transforms a vector to local coordinates.
+
+        Given orthogonal unit vectors x_local and y_local expressed in the
+        global frame, construct the rotation matrix R whose columns are the
+        local basis vectors:
+
+            R = [ x_local | y_local | z_local ]
+
+        where z_local = x_local × y_local (right-hand rule).
+
+        Because the columns are orthonormal, R is an orthogonal matrix, meaning:
+
+            R⁻¹ = Rᵀ
+
+        R acts as a change-of-basis operator. Multiplying on the right by R
+        transforms a vector from local coordinates to global:
+
+            v_global = R @ v_local
+
+        Its transpose therefore transforms the other direction — from global to
+        local — which is what the load transformation requires:
+
+            v_local = Rᵀ @ v_global
+
+
+        '''
+        z_local = np.cross(x_local, y_local)
+        return np.column_stack([x_local, y_local, z_local])
+
+    @property
+    def _transformed_value(self):
+        '''
+        Compute the full 6-component [Fx,Fy,Fz,Mx,My,Mz] in local coordinates.
+        
+        Forces and moments are both free vectors: they transform under a pure
+        rotation by the same rule, with no coupling between them.
+
+        Given the 6-component global load vector [Fx, Fy, Fz, Mx, My, Mz], the
+        transformation to local coordinates applies Rᵀ independently to the
+        force and moment sub-vectors:
+
+            F_local = Rᵀ @ F_global
+            M_local = Rᵀ @ M_global
+
+        This is exact for any rotation angle, not just 90-degree increments. The
+        inverse of an orthogonal matrix is its transpose, so no matrix inversion
+        is needed.
+        '''
+        R = self._build_rotation_matrix(self._x_local, self._y_local)
+        force_local  = R.T @ self._raw_value[:3]
+        moment_local = R.T @ self._raw_value[3:]
+        return np.concatenate([force_local, moment_local])
+
     @property
     def _raw_value(self):
         return np.array([self._fx, self._fy, self._fz, self._mx, self._my, self._mz])
@@ -140,81 +204,33 @@ class Load(metkObject):
     def moment(self):
         return self._raw_value[3:]
     
-    def rotate_on_axis(self, vector, axis, angle):
-        angle = np.radians(angle)
-        M = {
-            'x': self._ROTX(angle),
-            'y': self._ROTY(angle),
-            'z': self._ROTZ(angle),
-        }
-        return np.matmul(np.linalg.inv(M[axis.lower()]), vector)
-
-    def _ROTX(self, angle):
-        return np.array([
-            [ 1,               0,              0 ],
-            [ 0,   np.cos(angle), -np.sin(angle) ],
-            [ 0,   np.sin(angle),  np.cos(angle) ]
-        ])
-
-    def _ROTY(self, angle):
-        return np.array([
-            [  np.cos(angle),   0,  -np.sin(angle) ],
-            [              0,   1,               0 ],
-            [  np.sin(angle),   0,   np.cos(angle) ]
-        ])
-
-    def _ROTZ(self, angle):
-        return np.array([
-            [  np.cos(angle), -np.sin(angle),  0 ],
-            [  np.sin(angle),  np.cos(angle),  0 ],
-            [              0,              0,  1 ]
-        ])
-
     @property
     def value(self):
-        return [ self.fx, self.fy, self.fz, self.mx, self.my, self.mz ]
-    
+        return list(self._transformed_value)
+
     @property
     def fx(self):
-        if self.transformed:
-            return self._to_local(self.primary, self.secondary, 'f_x')
-        else:
-            return self._fx
-    
+        return self._transformed_value[0]
+
     @property
     def fy(self):
-        if self.transformed:
-            return self._to_local(self.primary, self.secondary, 'f_y')
-        else:
-            return self._fy
-    
+        return self._transformed_value[1]
+
     @property
     def fz(self):
-        if self.transformed:
-            return self._to_local(self.primary, self.secondary, 'f_z')
-        else:
-            return self._fz
-    
+        return self._transformed_value[2]
+
     @property
     def mx(self):
-        if self.transformed:
-            return self._to_local(self.primary, self.secondary, 'm_x')
-        else:
-            return self._mx
-    
+        return self._transformed_value[3]
+
     @property
     def my(self):
-        if self.transformed:
-            return self._to_local(self.primary, self.secondary, 'm_y')
-        else:
-            return self._my
-    
+        return self._transformed_value[4]
+
     @property
     def mz(self):
-        if self.transformed:
-            return self._to_local(self.primary, self.secondary, 'm_z')
-        else:
-            return self._mz
+        return self._transformed_value[5]
         
     f_x = fx
     f_y = fy
