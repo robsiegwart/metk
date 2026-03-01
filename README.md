@@ -19,6 +19,8 @@ just yet.
 
 ## Package Contents
 
+- `loads` — Classes for defining loads with support for transformation into
+  other coordinate systems
 - `shapes` — Standard and custom structural shape classes including a built-in
   library of structural shapes from the AISC shapes database
 - `materials` — Material classes including a built-in library of some
@@ -68,9 +70,21 @@ Standard, named, structural shapes as defined in the AISC Shapes Database:
 7.08
 ```
 
-The complete AISC shapes database (v15?) has been converted to a Pandas
-DataFrame and serialized into a Python pickle file (plan to convert these to CSV
-for transparency and portability).
+The complete AISC Shapes Database (v16) has been converted to a SQLite database
+with a table per shape and is included in the package. Properties from this are
+retrieved automatically when a standard shape is instantiated.
+
+In any case, you can use the generic `StructuralShape` class and specify the
+shape name as a string:
+
+```python
+>>> shape = StructuralShape('C9X15')
+>>> print(shape.A)
+4.4
+```
+
+For ones not `W`, `L`, or `HSS`, the raw scalar values from the database are
+available on the object.
 
 #### Custom Shapes
 
