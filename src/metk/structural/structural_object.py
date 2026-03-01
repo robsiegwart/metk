@@ -418,10 +418,6 @@ class StructuralObjectGroup(Collection):
     def __contains__(self, item):
         return item in self.objects
 
-    def __iter__(self):
-        for obj in self.objects:
-            yield obj
-
     def __len__(self):
         return len(self.objects)
 
