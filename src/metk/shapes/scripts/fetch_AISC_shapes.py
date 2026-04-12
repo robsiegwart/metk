@@ -24,7 +24,20 @@ OUT_PATH = os.path.join("..", "structural_shape_data", "shapes.db")
 
 print("Downloading AISC shapes database...")
 data = pd.read_excel(DB_URL, sheet_name="Database v16.0")
-print(f"  {len(data)} rows, {len(data.columns)} columns")
+print(f"  {len(data)} rows, {len(data.columns)} columns (before trimming metric columns)")
+
+# The spreadsheet has two side-by-side blocks: US customary (left) and metric
+# (right). The metric block starts at the second "EDI_Std_Nomenclature" column,
+# which pandas auto-renames to "EDI_Std_Nomenclature.1". Drop it and everything
+# to its right as we are just using US customary data for now.
+metric_start = next(
+    (i for i, c in enumerate(data.columns) if c == "EDI_Std_Nomenclature.1"), None
+)
+if metric_start is not None:
+    data = data.iloc[:, :metric_start]
+    print(f"  Discarded metric columns (kept {len(data.columns)} US customary columns)")
+else:
+    print("  Warning: second 'EDI_Std_Nomenclature' column not found; metric columns may not have been removed")
 
 shape_types = sorted(data["Type"].dropna().unique())
 print(f"  Shape types: {shape_types}")
