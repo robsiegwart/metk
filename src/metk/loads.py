@@ -82,11 +82,11 @@ class Load(metkObject):
         if not self._mz:
             self._mz = kwargs.get("mz", 0)
 
-        self.primary = kwargs.get("primary", "x")
-        self.secondary = kwargs.get("secondary", "y")
+        self._primary = kwargs.get("primary", "x")
+        self._secondary = kwargs.get("secondary", "y")
         self.name = kwargs.get("name", "<unnamed>").capitalize()
 
-        self._x_local, self._y_local = self._parse_axes(self.primary, self.secondary)
+        self._x_local, self._y_local = self._parse_axes(self._primary, self._secondary)
 
     def _parse_axes(self, primary, secondary):
         """
@@ -169,6 +169,41 @@ class Load(metkObject):
         """
         z_local = np.cross(x_local, y_local)
         return np.column_stack([x_local, y_local, z_local])
+
+    @property
+    def primary(self):
+        return self._primary
+
+    @primary.setter
+    def primary(self, value):
+        '''
+        Note, setting primary alone may raise ValueError if the new axis is not
+        orthogonal to the current secondary. Use set_axes() to change both at
+        once and avoid needing a valid intermediate state.
+        '''
+        self._primary = value
+        self._x_local, self._y_local = self._parse_axes(self._primary, self._secondary)
+
+    @property
+    def secondary(self):
+        return self._secondary
+
+    @secondary.setter
+    def secondary(self, value):
+        '''
+        Note, setting secondary alone may raise ValueError if the new axis is
+        not orthogonal to the current primary. Use set_axes() to change both at
+        once and avoid needing a valid intermediate state.
+        '''
+        self._secondary = value
+        self._x_local, self._y_local = self._parse_axes(self._primary, self._secondary)
+
+    def set_axes(self, primary, secondary):
+        """Set both local axes at once, validating orthogonality only after
+        both values are in place."""
+        self._x_local, self._y_local = self._parse_axes(primary, secondary)
+        self._primary = primary
+        self._secondary = secondary
 
     @property
     def _transformed_value(self):
