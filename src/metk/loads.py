@@ -41,9 +41,31 @@ class Load(metkObject):
     """
     A generic load containing force and moment components. Loads can be
     transformed to an arbitrary local coordinate system by specifying the
-    directions of the local x and y axes (``primary`` and ``secondary``).
-    Axes may be given as string labels (``'x'``, ``'-z'``, etc.) or as
-    arbitrary orthogonal unit vectors.
+    directions of the local x and y axes (``primary`` and ``secondary``
+    arguments). Primary and secondary axes may be given as string labels
+    (``'x'``, ``'-z'``, etc.) or as orthogonal unit vectors (array-like).
+
+    Args:
+        fx, fy, fz: Force components in the global x, y, and z directions.
+        mx, my, mz: Moment components about the global x, y, and z axes.
+        primary:    Local x-axis direction. String label or unit vector.
+                    Defaults to ``'x'``.
+        secondary:  Local y-axis direction. String label or unit vector.
+                    Must be orthogonal to ``primary``. Defaults to ``'y'``.
+        name:       Optional label for the load.
+
+    After construction the coordinate system can be changed with
+    ``set_axes(primary, secondary)``, or by assigning to ``primary`` or
+    ``secondary`` individually (provided the new axis is orthogonal to the
+    one already set).
+
+    Examples::
+
+        >>> load = Load(fx=1000, fz=500, my=-200)
+        >>> load = Load(fx=1000, fz=500, primary='-z', secondary='x')
+        >>> load = Load.from_components(1000, 0, 500, 0, -200, 0)
+        >>> load.set_axes('y', 'x')
+        >>> load.set_axes([0, 1, 0], [1, 0, 0])
     """
 
     _load_re = re.compile(r"^-?[xyz]$")
@@ -64,28 +86,17 @@ class Load(metkObject):
 
     _coords = {"f_x": 0, "f_y": 1, "f_z": 2, "m_x": 3, "m_y": 4, "m_z": 5}
 
-    def __init__(self, *args, **kwargs):
-        kwargs = {k.lower().replace("_", ""): v for k, v in kwargs.items()}
-        self._fx, self._fy, self._fz, self._mx, self._my, self._mz = list(args) + [
-            0
-        ] * (6 - len(args))
-        if not self._fx:
-            self._fx = kwargs.get("fx", 0)
-        if not self._fy:
-            self._fy = kwargs.get("fy", 0)
-        if not self._fz:
-            self._fz = kwargs.get("fz", 0)
-        if not self._mx:
-            self._mx = kwargs.get("mx", 0)
-        if not self._my:
-            self._my = kwargs.get("my", 0)
-        if not self._mz:
-            self._mz = kwargs.get("mz", 0)
-
-        self._primary = kwargs.get("primary", "x")
-        self._secondary = kwargs.get("secondary", "y")
-        self.name = kwargs.get("name", "<unnamed>").capitalize()
-
+    def __init__(self, fx=0, fy=0, fz=0, mx=0, my=0, mz=0,
+                 primary="x", secondary="y", name="<unnamed>"):
+        self._fx = fx
+        self._fy = fy
+        self._fz = fz
+        self._mx = mx
+        self._my = my
+        self._mz = mz
+        self._primary = primary
+        self._secondary = secondary
+        self.name = name.capitalize()
         self._x_local, self._y_local = self._parse_axes(self._primary, self._secondary)
 
     def _parse_axes(self, primary, secondary):
