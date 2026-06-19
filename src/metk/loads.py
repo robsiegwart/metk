@@ -49,7 +49,7 @@ class Load(metkObject):
     _load_re = re.compile(r"^-?[xyz]$")
     """regex for load labels such as '-x','y','-z' ... """
 
-    _properties = ["f_x", "f_y", "f_z", "m_x", "m_y", "m_z", "primary", "secondary"]
+    _properties = ("f_x", "f_y", "f_z", "m_x", "m_y", "m_z", "primary", "secondary")
 
     # Maps axis label strings to their corresponding global unit vectors.
     # Used by ``_parse_axes`` when string labels are provided.
