@@ -28,9 +28,7 @@ just yet.
 - [`stress`](#stress) — Stress analysis and transformation
 - [`structural`](#structural) — Classes for structural components (e.g. welds, bolts)
 
-## Examples
-
-### Overview Example
+## Overview Example
 
 Stress analysis of a weld, given its geometry and loading.
 
@@ -52,12 +50,12 @@ print(weld.von_mises)
 5888.72984290278
 ```
 
-### Shapes
+## Shapes
 
 Classes for defining custom shapes or retrieving standard shapes (W, C, HSS,
 etc.).
 
-#### Standard shapes
+### Standard shapes
 
 Standard, named, structural shapes as defined in the AISC Shapes Database:
 - `W`
@@ -86,7 +84,7 @@ shape name as a string:
 For ones not `W`, `L`, or `HSS`, the raw scalar values from the database are
 available on the object.
 
-#### Custom Shapes
+### Custom Shapes
 
 Weld shapes:
 - `LineWeld`
@@ -145,7 +143,7 @@ tdes    0.116
 ------  -----
 ```
 
-### Materials
+## Materials
 
 Material classes defining a material with its properties accessible as object
 properties (e.g. mat.E or mat.YS).
@@ -193,7 +191,7 @@ elongation             0.16
 60200
 ```
 
-### Stress
+## Stress
 
 `StressElement` represents a 3D stress point defined by its stress components:
 normal stresses in x, y, and z; and shear stresses in xy, yz, and xz planes.
@@ -213,7 +211,7 @@ Derived stress quantities are then available:
 20600.847753831724
 ```
 
-### Loads
+## Loads
 
 The `loads` module provides two complementary systems for representing
 mechanical loads.
@@ -233,7 +231,7 @@ individual `Force` or `Moment` objects before summing, which is useful for
 load combinations (e.g. 1.2D + 1.6L).
 
 
-#### Axis convention
+### Axis convention
 
 The `primary` and `secondary` arguments follow a **passive transformation**
 convention: they define where the local axes point, expressed in the global
@@ -245,7 +243,7 @@ local axes.
 <!-- TODO: add a diagram showing the global frame, the local frame, and a
 sample load vector expressed in both -->
 
-#### Transforming loads
+### Transforming loads
 
 ```python
 >>> from metk import Load
@@ -283,6 +281,6 @@ f_x=500   f_y=1,000   f_z=-200
 f_x=829   f_y=289   f_z=721
 ```
 
-### Structural
+## Structural
 
 TODO
