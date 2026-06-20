@@ -19,14 +19,14 @@ just yet.
 
 ## Package Contents
 
-- `loads` — Classes for defining loads with support for transformation into
+- [`loads`](#loads) — Classes for defining loads with support for transformation into
   other coordinate systems
-- `shapes` — Standard and custom structural shape classes including a built-in
+- [`shapes`](#shapes) — Standard and custom structural shape classes including a built-in
   library of structural shapes from the AISC shapes database
-- `materials` — Material classes including a built-in library of some
+- [`materials`](#materials) — Material classes including a built-in library of some
   engineering materials with basic mechanical properties
-- `stress` — Stress analysis and transformation
-- `structural` — Classes for structural components (e.g. welds, bolts)
+- [`stress`](#stress) — Stress analysis and transformation
+- [`structural`](#structural) — Classes for structural components (e.g. welds, bolts)
 
 ## Examples
 
@@ -282,3 +282,7 @@ f_x=500   f_y=1,000   f_z=-200
 >>> print(load)
 f_x=829   f_y=289   f_z=721
 ```
+
+### Structural
+
+TODO
