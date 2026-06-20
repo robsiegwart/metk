@@ -212,3 +212,73 @@ Derived stress quantities are then available:
 >>> print(elem.intensity)
 20600.847753831724
 ```
+
+### Loads
+
+The `loads` module provides two complementary systems for representing
+mechanical loads.
+
+**`Load`** is a complete, self-contained 6-DOF state: all six components
+(Fx, Fy, Fz, Mx, My, Mz) in one object, with coordinate transformation built
+in. Use it when you already know the full load at a point — for example, from
+FEA output — and want to work with it directly or express it in a local
+coordinate system.
+
+**`Force` / `Moment` / `CombinedLoad`** are a compositional system for
+building up a resultant load from individual contributions. The key capability
+that `Load` lacks is `Force.r` — a position vector. When multiple forces are
+applied at different locations, `CombinedLoad` sums them and computes the
+resultant moment at the origin via `r × F` for each one. `Factor` scales
+individual `Force` or `Moment` objects before summing, which is useful for
+load combinations (e.g. 1.2D + 1.6L).
+
+
+#### Axis convention
+
+The `primary` and `secondary` arguments follow a **passive transformation**
+convention: they define where the local axes point, expressed in the global
+frame. `primary='z'` means "the local x-axis points in the global +z
+direction" — not "the global x-axis is renamed z." The load vector itself does
+not move; it is simply re-expressed in the new frame by projecting onto the
+local axes.
+
+<!-- TODO: add a diagram showing the global frame, the local frame, and a
+sample load vector expressed in both -->
+
+#### Transforming loads
+
+```python
+>>> from metk import Load
+>>> load = Load(fx=1000, fy=500, fz=200)
+
+# by default, the load is defined in the standard coordinate system so the loads
+# are aligned and unchanged
+>>> print(load.primary, load.secondary)
+x y
+>>> print(load)
+f_x=1,000   f_y=500   f_z=200
+
+# Change it to a new coordinate system orthogonal to the global cartesian
+# coordinate system with the local x-axis pointing in the global z direction and
+# the local y-axis pointing in the global -x direction.
+>>> load.set_axes('z', '-x')
+>>> print(load)
+f_x=200   f_y=-1,000   f_z=-500
+
+# Define the local coordinate system by numerical unit vectors
+>>> load.set_axes([0, 1, 0], [1, 0, 0])
+>>> print(load)
+f_x=500   f_y=1,000   f_z=-200
+
+# Define the local coordinate system by arbitrary unit vectors
+>>> v = np.array([3.0, 1.0, -2.0])
+>>> w = np.array([-0.22237479  0.96362411  0.14824986])
+# NB: w was calculated to be orthogonal to v as determined via the Gram-Schmidt
+# process:
+#   ref = np.array([0.0, 1.0, 0.0])     # arbitrary reference vector
+#   w = ref - np.dot(ref, u) * u
+#   w = w / np.linalg.norm(w)
+>>> load.set_axes(v, w)
+>>> print(load)
+f_x=829   f_y=289   f_z=721
+```
