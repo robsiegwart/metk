@@ -32,6 +32,8 @@ just yet.
 
 Stress analysis of a weld, given its geometry and loading.
 
+![Example weld analysis](assets/example-weld-analysis.excalidraw.png)
+
 ```python
 from metk import Weld, DoubleLineWeld, Load
 
