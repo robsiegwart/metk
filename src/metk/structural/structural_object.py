@@ -92,12 +92,12 @@ class StructuralObject(metkObject):
         #      which pandas converts to nan
         if not loads:
             loads = Load(
-                f_x=kwargs.get("f_x", 0),
-                f_y=kwargs.get("f_y", 0),
-                f_z=kwargs.get("f_z", 0),
-                m_x=kwargs.get("m_x", 0),
-                m_y=kwargs.get("m_y", 0),
-                m_z=kwargs.get("m_z", 0),
+                fx=kwargs.get("f_x", 0),
+                fy=kwargs.get("f_y", 0),
+                fz=kwargs.get("f_z", 0),
+                mx=kwargs.get("m_x", 0),
+                my=kwargs.get("m_y", 0),
+                mz=kwargs.get("m_z", 0),
                 primary=kwargs.get("primary", "x"),
                 secondary=kwargs.get("secondary", "y"),
             )
