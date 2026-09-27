@@ -5,7 +5,7 @@ Base classes for the package.
 import string
 import random
 from tabulate import tabulate
-from metk.props import *
+from metk.props import shape_props, load_props, material_props
 from typing import Any, Dict, Tuple
 
 

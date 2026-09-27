@@ -92,11 +92,11 @@ class TestLoadConstruction:
         np.testing.assert_array_equal(load.moment, [4, 5, 6])
 
     def test_invalid_primary_secondary_combo_raises(self):
-        with pytest.raises(Exception):
+        with pytest.raises(ValueError):
             Load(primary="x", secondary="x")
 
     def test_invalid_axis_label_raises(self):
-        with pytest.raises(Exception):
+        with pytest.raises(ValueError):
             Load(primary="a", secondary="b")
 
 
@@ -163,7 +163,7 @@ class TestLoadArithmetic:
 
     def test_add_non_load_raises(self):
         load = Load(fx=10)
-        with pytest.raises(Exception):
+        with pytest.raises(TypeError):
             _ = load + 5
 
 

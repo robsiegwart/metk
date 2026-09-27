@@ -299,7 +299,8 @@ class HSS(StandardShape):
     B
         Overall width
     b_1
-        Width of flat wall (stored as ``b_1`` due to SQLite case-insensitivity conflict with ``B``)
+        Width of flat wall (stored as ``b_1`` due to SQLite case-insensitivity
+        conflict with ``B``)
     t_nom
         Nominal wall thickness
     t_des
@@ -380,8 +381,9 @@ def StructuralShape(name):
     """
     Return a structural shape class based on its name.
 
-    :param str name:    A valid structural shape name (such as 'HSS6X10X.375' or 'L6X6X1/2')
+    :param str name:    A valid structural shape name (such as 'HSS6X10X.375'
+        or 'L6X6X1/2')
     """
     if not is_structural_shape_label(name):
-        raise Exception(f'Input "{name}" not a valid shape label.')
+        raise ValueError(f'Input "{name}" not a valid shape label.')
     return get_standard_shape(name)

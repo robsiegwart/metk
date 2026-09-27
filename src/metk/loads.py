@@ -86,8 +86,18 @@ class Load(metkObject):
 
     _coords = {"f_x": 0, "f_y": 1, "f_z": 2, "m_x": 3, "m_y": 4, "m_z": 5}
 
-    def __init__(self, fx=0, fy=0, fz=0, mx=0, my=0, mz=0,
-                 primary="x", secondary="y", name="<unnamed>"):
+    def __init__(
+        self,
+        fx=0,
+        fy=0,
+        fz=0,
+        mx=0,
+        my=0,
+        mz=0,
+        primary="x",
+        secondary="y",
+        name="<unnamed>",
+    ):
         self._fx = fx
         self._fy = fy
         self._fz = fz
@@ -187,11 +197,11 @@ class Load(metkObject):
 
     @primary.setter
     def primary(self, value):
-        '''
+        """
         Note, setting primary alone may raise ValueError if the new axis is not
         orthogonal to the current secondary. Use set_axes() to change both at
         once and avoid needing a valid intermediate state.
-        '''
+        """
         self._primary = value
         self._x_local, self._y_local = self._parse_axes(self._primary, self._secondary)
 
@@ -201,11 +211,11 @@ class Load(metkObject):
 
     @secondary.setter
     def secondary(self, value):
-        '''
+        """
         Note, setting secondary alone may raise ValueError if the new axis is
         not orthogonal to the current primary. Use set_axes() to change both at
         once and avoid needing a valid intermediate state.
-        '''
+        """
         self._secondary = value
         self._x_local, self._y_local = self._parse_axes(self._primary, self._secondary)
 
@@ -294,7 +304,7 @@ class Load(metkObject):
 
     def __add__(self, other):
         if not isinstance(other, Load):
-            raise Exception
+            raise TypeError(f"Cannot add Load and {type(other).__name__}")
         return Load(*(self.value + other.value))
 
     def __str__(self):
@@ -361,10 +371,10 @@ class Force(VectorLoad):
     point and defaults to [0,0,0] so the moment is 0 by default.
     """
 
-    def __init__(self, F=[0, 0, 0], r=[0, 0, 0], **kwargs):
+    def __init__(self, F=None, r=None, **kwargs):
         super().__init__(**kwargs)
-        self._raw_value = np.asarray(F)
-        self._r = np.asarray(r)
+        self._raw_value = np.asarray(F if F is not None else [0, 0, 0])
+        self._r = np.asarray(r if r is not None else [0, 0, 0])
 
     @property
     def F(self):
@@ -410,7 +420,10 @@ class Force(VectorLoad):
     __mul__ = __rmul__
 
     def __repr__(self):
-        return f"Force {self.name}   F={self._raw_value}, r={self._r}, factor: {self.factor}"
+        return (
+            f"Force {self.name}   F={self._raw_value}, "
+            f"r={self._r}, factor: {self.factor}"
+        )
 
 
 class Moment(VectorLoad):
@@ -453,9 +466,9 @@ class CombinedLoad:
     for which force and moment summations may be performed.
     """
 
-    def __init__(self, forces=[], moments=[], name=""):
-        self.forces = forces
-        self.moments = moments
+    def __init__(self, forces=None, moments=None, name=""):
+        self.forces = forces if forces is not None else []
+        self.moments = moments if moments is not None else []
         self.name = name
 
     @property

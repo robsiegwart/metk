@@ -315,7 +315,7 @@ class TestStructuralShapeFactory:
         assert isinstance(StructuralShape("L6X6X1/2"), L)
 
     def test_invalid_label_raises(self):
-        with pytest.raises(Exception):
+        with pytest.raises(ValueError):
             StructuralShape("ROUNDBAR")
 
     def test_unregistered_type_returns_generic_instance(self):

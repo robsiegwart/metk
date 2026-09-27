@@ -54,7 +54,7 @@ class Circle(DoublySymmetricShape):
         return pi * self.r**2
 
     @property
-    def I(self):
+    def I(self):  # noqa: E743 -- standard engineering symbol for moment of inertia
         return pi * self.r**4 / 4
 
     @property

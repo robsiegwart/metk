@@ -146,4 +146,5 @@ class BoltGroup(StructuralObjectGroup):
         return self._bolts
 
     def __repr__(self):
-        return f"Bolt evaluation {self.name + ' ' if self.name else ''}containing {len(self.objects)} bolts"
+        name = f"{self.name} " if self.name else ""
+        return f"Bolt evaluation {name}containing {len(self.objects)} bolts"
